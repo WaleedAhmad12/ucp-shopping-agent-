@@ -1,0 +1,1 @@
+{"email": "test@example.com", "shipping": {"id": "shipping_address", "first_name": "Waleed", "last_name": "Ahmad", "phone_number": "+923001234567", "street_address": "Main Boulevard", "extended_address": "Apt 4B", "address_locality": "Lahore", "address_region": "Punjab", "postal_code": "54000", "address_country": "PK"}}
