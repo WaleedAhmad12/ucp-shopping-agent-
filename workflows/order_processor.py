@@ -1,5 +1,7 @@
 # workflows/order_processor.py
-from commerce_core import search_products, create_cart, get_checkout_schema, update_checkout
+from commerce_core.catalog.catalog import search_products
+from commerce_core.cart import create_cart
+from commerce_core.checkout import get_checkout_schema, update_checkout
 from commerce_core.engine import run_command
 
 def clean_payload(data, schema):
@@ -53,10 +55,6 @@ def run_order_flow(query, user_data):
 
 
 
-
-# Add this function to workflows/order_processor.py
-from commerce_core import create_cart, get_checkout_schema, update_checkout
-from commerce_core.engine import run_command
 
 def run_order_flow_multi(business, variant_ids, user_data):
     # 1. Create Cart with multiple items

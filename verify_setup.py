@@ -1,5 +1,5 @@
 # verify_setup.py
-from commerce_core import search_products
+from commerce_core.catalog.catalog import search_products
 
 def verify():
     print("--- Verifying commerce_core Library ---")
