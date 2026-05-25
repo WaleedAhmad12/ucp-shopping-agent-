@@ -7,16 +7,46 @@ const API_BASE = "http://127.0.0.1:8000";
 function App() {
   const [query, setQuery] = useState('');
   const [limit, setLimit] = useState(10); // Added limit state
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [checkoutUrls, setCheckoutUrls] = useState({});
   const [loading, setLoading] = useState(false);
 
+  const dollarsToCents = (value) => {
+    if (value === '') {
+      return null;
+    }
+
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+
+    return Math.round(parsed * 100);
+  };
+
   const handleSearch = async () => {
     try {
-      // Updated to include limit parameter
-      const res = await axios.get(`${API_BASE}/api/search?query=${query}&limit=${limit}`);
+      const params = new URLSearchParams({
+        query,
+        limit: String(limit),
+      });
+
+      const minPriceCents = dollarsToCents(minPrice);
+      const maxPriceCents = dollarsToCents(maxPrice);
+
+      if (minPriceCents !== null) {
+        params.set('min_price', String(minPriceCents));
+      }
+
+      if (maxPriceCents !== null) {
+        params.set('max_price', String(maxPriceCents));
+      }
+
+      const res = await axios.get(`${API_BASE}/api/search?${params.toString()}`);
       const items = res.data.result?.products || res.data.products || [];
       setProducts(items);
     } catch (err) {
@@ -91,6 +121,34 @@ function App() {
           <option value={25}>25 results</option>
           <option value={50}>50 results</option>
         </select>
+
+        <div className="flex items-center w-32 bg-gray-800 border border-gray-600 rounded-lg px-3">
+          <span className="text-gray-400 mr-1">$</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            placeholder="0.5"
+            className="w-full bg-transparent text-white outline-none"
+          />
+        </div>
+
+        <div className="flex items-center w-32 bg-gray-800 border border-gray-600 rounded-lg px-3">
+          <span className="text-gray-400 mr-1">$</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="9999"
+            className="w-full bg-transparent text-white outline-none"
+          />
+        </div>
 
         <button onClick={handleSearch} className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700">
           Search

@@ -43,8 +43,8 @@ class CartItem(BaseModel):
 
 # --- ENDPOINTS ---
 @app.get("/api/search")
-async def search(query: str, limit: int = 10):
-    raw_data = search_products(query, limit=limit)
+async def search(query: str, limit: int = 10, min_price: int | None = None, max_price: int | None = None):
+    raw_data = search_products(query, limit=limit, min_price=min_price, max_price=max_price)
 
     # If the CLI returned a dict, try to find the products list in common locations
     if isinstance(raw_data, dict):
