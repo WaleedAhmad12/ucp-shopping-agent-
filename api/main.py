@@ -7,6 +7,7 @@ import json
 
 # Import your core logic
 from commerce_core.catalog.catalog import search_products
+from commerce_core.catalog.store_specific_catalog import search_store_products
 from commerce_core.catalog.product_detail import get_product
 from commerce_core.catalog.lookup_catalog import lookup_multiple_businesses
 from workflows.order_processor import run_order_flow, run_order_flow_multi
@@ -66,6 +67,27 @@ async def search(query: str, limit: int = 10, min_price: int | None = None, max_
         return {"result": {"products": raw_data}}
 
     # Last resort: return raw data as-is
+    return raw_data
+
+
+@app.get("/api/store_search")
+async def store_search(query: str, limit: int = 10, min_price: int | None = None, max_price: int | None = None):
+    raw_data = search_store_products(query, limit=limit, min_price=min_price, max_price=max_price)
+
+    if isinstance(raw_data, dict):
+        if 'result' in raw_data and isinstance(raw_data['result'], dict) and 'products' in raw_data['result']:
+            return {"result": raw_data['result']}
+
+        if 'products' in raw_data and isinstance(raw_data['products'], list):
+            return {"result": {"products": raw_data['products']}}
+
+        for key, value in raw_data.items():
+            if isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict) and 'variants' in value[0]:
+                return {"result": {"products": value}}
+
+    if isinstance(raw_data, list):
+        return {"result": {"products": raw_data}}
+
     return raw_data
 
 

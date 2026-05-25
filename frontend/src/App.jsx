@@ -5,6 +5,7 @@ import ProductCard from './components/ProductCard';
 const API_BASE = "http://127.0.0.1:8000";
 
 function App() {
+  const [searchMode, setSearchMode] = useState('global');
   const [query, setQuery] = useState('');
   const [limit, setLimit] = useState(10); // Added limit state
   const [minPrice, setMinPrice] = useState('');
@@ -46,7 +47,8 @@ function App() {
         params.set('max_price', String(maxPriceCents));
       }
 
-      const res = await axios.get(`${API_BASE}/api/search?${params.toString()}`);
+      const endpoint = searchMode === 'store' ? '/api/store_search' : '/api/search';
+      const res = await axios.get(`${API_BASE}${endpoint}?${params.toString()}`);
       const items = res.data.result?.products || res.data.products || [];
       setProducts(items);
     } catch (err) {
@@ -104,12 +106,53 @@ function App() {
       </div>
 
       {/* Search Bar with Pagination Control */}
-      <div className="max-w-6xl mx-auto flex flex-wrap gap-2 mb-8">
+      <div className="max-w-6xl mx-auto mb-8 space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setSearchMode('global')}
+            className={`px-4 py-2 rounded-lg font-semibold border transition ${
+              searchMode === 'global'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white/5 text-white border-white/10 hover:bg-white/10'
+            }`}
+          >
+            Global Search
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSearchMode('store')}
+            className={`px-4 py-2 rounded-lg font-semibold border transition ${
+              searchMode === 'store'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white/5 text-white border-white/10 hover:bg-white/10'
+            }`}
+          >
+            Store Specific Search
+          </button>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 md:p-6">
+          <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="text-xl font-bold text-white">
+                {searchMode === 'store' ? 'Store Specific Search' : 'Global Search'}
+              </h2>
+              <p className="text-sm text-gray-300 mt-1">
+                {searchMode === 'store'
+                  ? 'Search only within the fixed store catalog.'
+                  : 'Search across the global catalog.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
         <input 
           className="border border-gray-600 bg-gray-800 text-white p-3 flex-grow rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for products..."
+          placeholder={searchMode === 'store' ? 'Search store products...' : 'Search for products...'}
         />
         
         <select 
@@ -151,8 +194,10 @@ function App() {
         </div>
 
         <button onClick={handleSearch} className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700">
-          Search
+          {searchMode === 'store' ? 'Search Store' : 'Search'}
         </button>
+          </div>
+        </div>
       </div>
 
       {/* Product Grid */}
