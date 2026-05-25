@@ -1,8 +1,11 @@
 ﻿import subprocess
 import json
+from .config import get_ucp_cmd
+
 
 def run_command(command, business=None, payload=None, profile='my-agent'):
-    full_cmd = [r'C:\Users\Waleed\AppData\Roaming\npm\ucp.cmd'] + command
+    ucp_cmd = get_ucp_cmd()
+    full_cmd = [ucp_cmd] + command
     if business: full_cmd += ['--business', business]
     full_cmd += ['--profile', profile, '--format', 'json']
     if payload: full_cmd.extend(['--input', json.dumps(payload, separators=(',', ':'))])
